@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".ShoppingApp"
         android:allowBackup="true"
@@ -11,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingListApp">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -21,5 +25,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- VK SDK -->
+        <meta-data
+            android:name="VKSdkVersion"
+            android:value="4.1.0"
+            tools:replace="android:value" />
+
+        <!-- Yandex LoginSDK -->
+        <meta-data
+            android:name="com.yandex.auth.CLIENT_ID"
+            android:value="${YANDEX_CLIENT_ID}" />
+
+        <activity
+            android:name="com.yandex.authsdk.internal.strategy.NativeAuthActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="${YANDEX_CLIENT_ID}"
+                    android:scheme="yx${YANDEX_CLIENT_ID}" />
+            </intent-filter>
+        </activity>
+
     </application>
 </manifest>

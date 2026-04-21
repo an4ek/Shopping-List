@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,15 +21,27 @@ import com.example.domain.model.ShoppingList
 @Composable
 fun ShoppingListScreen(
     onListClick: (Long) -> Unit,
+    onAboutClick: () -> Unit,
     viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit) {
+        viewModel.onScreenViewed()
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Списки покупок") })
+            TopAppBar(
+                title = { Text("Списки покупок") },
+                actions = {
+                    IconButton(onClick = onAboutClick) {
+                        Icon(Icons.Default.Info, contentDescription = "О нас")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showDialog = true }) {
@@ -45,7 +58,7 @@ fun ShoppingListScreen(
                 Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Нет списков. Нажмите + чтобы создать", style = MaterialTheme.typography.bodyLarge)
+                Text("Нет списков. Нажмите + чтобы создать")
             }
         } else {
             LazyColumn(
@@ -102,14 +115,8 @@ fun ShoppingListItem(
     onDelete: () -> Unit,
     onComplete: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = list.name,
                 style = MaterialTheme.typography.titleMedium,
