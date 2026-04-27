@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp.ui.auth
 
-import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,7 +15,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val activity = LocalContext.current as Activity
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) onLoginSuccess()
@@ -32,26 +31,33 @@ fun LoginScreen(
         Text("Войдите чтобы продолжить", style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(48.dp))
 
-        if (uiState.isLoading) {
-            CircularProgressIndicator()
-        } else {
-            Button(
-                onClick = { viewModel.loginWithVk(activity) },
-                modifier = Modifier.fillMaxWidth().height(52.dp)
-            ) {
-                Text("Войти через ВКонтакте")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedButton(
-                onClick = { viewModel.loginWithYandex(activity) },
-                modifier = Modifier.fillMaxWidth().height(52.dp)
-            ) {
-                Text("Войти через Яндекс")
-            }
-            uiState.error?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = MaterialTheme.colorScheme.error)
-            }
+        Button(
+            onClick = { viewModel.loginWithVk(context as android.app.Activity) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
+        ) {
+            Text("Войти через ВКонтакте")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = { viewModel.loginWithYandex(context as android.app.Activity) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
+        ) {
+            Text("Войти через Яндекс")
+        }
+
+        if (uiState.error != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        TextButton(onClick = onLoginSuccess) {
+            Text("Продолжить без входа")
         }
     }
 }

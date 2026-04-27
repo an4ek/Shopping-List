@@ -18,3 +18,5 @@ layer-based/*/build/
 feature-based/*/build/
 
 *.sh
+google-services.json
+app/google-services.json

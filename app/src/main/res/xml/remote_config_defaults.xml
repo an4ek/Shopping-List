@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>welcome_banner_text</key>
+        <value>Добро пожаловать в Список покупок!</value>
+    </entry>
+    <entry>
+        <key>show_promo_banner</key>
+        <value>false</value>
+    </entry>
+</defaultsMap>

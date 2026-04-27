@@ -25,6 +25,8 @@ fun ShoppingListScreen(
     viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val welcomeText by viewModel.welcomeBannerText.collectAsState()
+    val showPromo by viewModel.showPromoBanner.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
 
@@ -49,30 +51,63 @@ fun ShoppingListScreen(
             }
         }
     ) { padding ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.lists.isEmpty()) {
-            Box(
-                Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+
+            // Remote Config баннер
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
-                Text("Нет списков. Нажмите + чтобы создать")
+                Text(
+                    text = welcomeText,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.lists, key = { it.id }) { list ->
-                    ShoppingListItem(
-                        list = list,
-                        onClick = { onListClick(list.id) },
-                        onDelete = { viewModel.delete(list.id) },
-                        onComplete = { viewModel.complete(list.id) }
+
+            // Промо баннер (управляется Remote Config)
+            if (showPromo) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
+                ) {
+                    Text(
+                        text = "🎉 Специальное предложение! Скидка 20% на все списки!",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.lists.isEmpty()) {
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Нет списков. Нажмите + чтобы создать")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.lists, key = { it.id }) { list ->
+                        ShoppingListItem(
+                            list = list,
+                            onClick = { onListClick(list.id) },
+                            onDelete = { viewModel.delete(list.id) },
+                            onComplete = { viewModel.complete(list.id) }
+                        )
+                    }
                 }
             }
         }

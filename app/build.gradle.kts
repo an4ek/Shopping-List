@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -71,6 +72,11 @@ dependencies {
     implementation("com.vk:android-sdk-api:4.1.0")
     implementation("com.yandex.android:authsdk:2.5.1")
     implementation("com.yandex.android:maps.mobile:4.6.1-lite")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-config")
+    implementation("com.google.firebase:firebase-firestore")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
