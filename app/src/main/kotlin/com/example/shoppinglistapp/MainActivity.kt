@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.shoppinglistapp.auth.AuthServiceImpl
 import com.example.shoppinglistapp.ui.about.AboutScreen
 import com.example.shoppinglistapp.ui.auth.LoginScreen
 import com.example.shoppinglistapp.ui.auth.LoginViewModel
@@ -23,9 +24,13 @@ import com.example.shoppinglistapp.ui.items.ShoppingItemScreen
 import com.example.shoppinglistapp.ui.lists.ShoppingListScreen
 import com.example.shoppinglistapp.ui.theme.ShoppingListAppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var authService: com.example.shoppinglistapp.auth.AuthService
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -37,6 +42,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermission()
+
+        // Регистрируем Яндекс лаунчер
+        (authService as? AuthServiceImpl)?.registerYandexLauncher(this)
+
         setContent {
             ShoppingListAppTheme {
                 AppNavigation()

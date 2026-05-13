@@ -71,7 +71,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.vk:android-sdk-core:4.1.0")
     implementation("com.vk:android-sdk-api:4.1.0")
-    implementation("com.yandex.android:authsdk:2.5.1")
+    implementation("com.yandex.android:authsdk:3.1.3")
     implementation("com.yandex.android:maps.mobile:4.6.1-lite")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-messaging")
