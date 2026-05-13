@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
@@ -28,6 +29,7 @@ fun ShoppingListScreen(
     val welcomeText by viewModel.welcomeBannerText.collectAsState()
     val showPromo by viewModel.showPromoBanner.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var showCrashDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
@@ -39,6 +41,9 @@ fun ShoppingListScreen(
             TopAppBar(
                 title = { Text("Списки покупок") },
                 actions = {
+                    IconButton(onClick = { showCrashDialog = true }) {
+                        Icon(Icons.Default.Warning, contentDescription = "Тест краша", tint = MaterialTheme.colorScheme.error)
+                    }
                     IconButton(onClick = onAboutClick) {
                         Icon(Icons.Default.Info, contentDescription = "О нас")
                     }
@@ -52,34 +57,19 @@ fun ShoppingListScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-
-            // Remote Config баннер
             Card(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
-                Text(
-                    text = welcomeText,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(text = welcomeText, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
             }
 
-            // Промо баннер (управляется Remote Config)
             if (showPromo) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                    )
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
                 ) {
-                    Text(
-                        text = "🎉 Специальное предложение! Скидка 20% на все списки!",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Text(text = "🎉 Специальное предложение!", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -88,10 +78,7 @@ fun ShoppingListScreen(
                     CircularProgressIndicator()
                 }
             } else if (uiState.lists.isEmpty()) {
-                Box(
-                    Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Нет списков. Нажмите + чтобы создать")
                 }
             } else {
@@ -111,6 +98,26 @@ fun ShoppingListScreen(
                 }
             }
         }
+    }
+
+    if (showCrashDialog) {
+        AlertDialog(
+            onDismissRequest = { showCrashDialog = false },
+            title = { Text("Тест краш-репортинга") },
+            text = { Text("Выберите тип ошибки для отправки в Crashlytics и AppMetrica") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCrashDialog = false
+                    viewModel.generateCrash()
+                }) { Text("Fatal crash", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCrashDialog = false
+                    viewModel.generateNonFatal()
+                }) { Text("Non-fatal") }
+            }
+        )
     }
 
     if (showDialog) {
@@ -135,9 +142,7 @@ fun ShoppingListScreen(
                 }) { Text("Создать") }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false; newListName = "" }) {
-                    Text("Отмена")
-                }
+                TextButton(onClick = { showDialog = false; newListName = "" }) { Text("Отмена") }
             }
         )
     }
