@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.navigation.compose)
+    implementation(libs.work.runtime)
     implementation("io.appmetrica.analytics:analytics:7.+")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.vk:android-sdk-core:4.1.0")
