@@ -2,6 +2,8 @@ package com.example.shoppinglistapp.ai
 
 import android.util.Log
 import com.example.shoppinglistapp.BuildConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -17,10 +19,10 @@ class GeminiService {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    suspend fun suggestItems(prompt: String): List<String> {
-        return try {
+    suspend fun suggestItems(prompt: String): List<String> = withContext(Dispatchers.IO) {
+        try {
             val json = JSONObject().apply {
-                put("model", "google/gemini-2.0-flash-exp:free")
+                put("model", "google/gemini-2.0-flash-lite-001")
                 put("messages", JSONArray().apply {
                     put(JSONObject().apply {
                         put("role", "user")
@@ -37,7 +39,8 @@ class GeminiService {
                 .build()
 
             val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: return emptyList()
+            val body = response.body?.string() ?: return@withContext emptyList()
+            Log.d("GeminiService", "Response: $body")
             val content = JSONObject(body)
                 .getJSONArray("choices")
                 .getJSONObject(0)
