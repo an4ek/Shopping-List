@@ -1,10 +1,8 @@
 import java.util.Properties
-
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) load(file.inputStream())
 }
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,7 +12,6 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
-
 android {
     namespace = "com.example.shoppinglistapp"
     compileSdk = 34
@@ -32,10 +29,24 @@ android {
         manifestPlaceholders["YANDEX_CLIENT_ID"] = localProperties["yandex_client_id"] ?: ""
         manifestPlaceholders["VK_APP_ID"] = localProperties["vk_app_id"] ?: ""
     }
+    flavorDimensions += "env"
+    productFlavors {
+        create("dev") {
+
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "BASE_URL", "\"https://dev.api.shoppinglist.com\"")
+        }
+        create("prod") {
+            buildConfigField("String", "BASE_URL", "\"https://api.shoppinglist.com\"")
+        }
+    }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -48,7 +59,6 @@ android {
         buildConfig = true
     }
 }
-
 dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
