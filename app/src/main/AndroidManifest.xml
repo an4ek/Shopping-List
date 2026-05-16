@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.help.HelpActivity"
+            android:exported="false" />
+
         <!-- FCM Service -->
         <service
             android:name=".push.PushMessagingService"
