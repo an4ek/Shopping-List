@@ -1,72 +1,27 @@
-# Shopping List App
+# Shopping List App 🛒
 
-Мобильное приложение для управления списками покупок на Jetpack Compose.
+Мобильное приложение для управления списками покупок на Jetpack Compose + Kotlin.
 
 ## Скриншоты
 
-![Авторизация](screenshots/01_login.png) ![Списки покупок](screenshots/02_lists.png) ![Товары](screenshots/03_items.png) ![AI-помощник](screenshots/04_ai.png) ![О нас](screenshots/05_about.png)
+| Авторизация | Списки | Товары | AI-помощник | О нас |
+|:-----------:|:------:|:------:|:-----------:|:-----:|
+| ![](screenshots/01_login.png) | ![](screenshots/02_lists.png) | ![](screenshots/03_items.png) | ![](screenshots/04_ai.png) | ![](screenshots/05_about.png) |
 
 ## Функциональность
 
 - Создание и управление списками покупок
-- Добавление товаров с категориями
+- Добавление товаров с указанием количества
+- Отметка купленных товаров
 - Авторизация через VK и Яндекс ID
-- AI-помощник: предлагает список продуктов по запросу (Gemini через OpenRouter)
+- AI-помощник: введи блюдо или событие — получи список продуктов
 - Push-уведомления через Firebase FCM
-- Карта с адресом офиса компании
-- Экран профиля с данными из Firestore
+- Карта с адресом офиса и маршрутом
+- Профиль пользователя через Firestore
 
-## Обязательные критерии
+## APK
 
-### Чистая архитектура
-- Модули: `:app`, `:domain`, `:data`, `:core`
-- Domain: `app/src/main/kotlin/com/example/domain/`
-- Use Cases: `domain/src/main/kotlin/com/example/domain/usecase/`
-- Репозитории (интерфейсы): `domain/src/main/kotlin/com/example/domain/repository/`
-- Репозитории (реализации): `data/src/main/kotlin/com/example/data/repository/`
-- DI через Hilt: `app/src/main/kotlin/com/example/shoppinglistapp/di/`
-
-### Фоновые задачи и сервисы
-- WorkManager: `app/src/main/kotlin/com/example/shoppinglistapp/worker/SyncWorker.kt`
-- BroadcastReceiver: `app/src/main/kotlin/com/example/shoppinglistapp/receiver/BootReceiver.kt`
-- Запуск при загрузке устройства, периодическая синхронизация каждые 15 минут с Constraints (NetworkType.CONNECTED)
-
-### Анимации в Jetpack Compose
-- `AnimatedVisibility` (промо-баннер): `app/src/main/kotlin/com/example/shoppinglistapp/ui/lists/ShoppingListScreen.kt` строки 60-72
-- `animateColorAsState` (карточка списка): `app/src/main/kotlin/com/example/shoppinglistapp/ui/lists/ShoppingListScreen.kt` строки 120-126
-
-### XML разметка и интеграция Compose
-- XML layout: `app/src/main/res/layout/activity_help.xml`
-- Activity с ComposeView: `app/src/main/kotlin/com/example/shoppinglistapp/ui/help/HelpActivity.kt`
-
-### Gradle: конфигурация сборок
-- buildTypes + productFlavors: `app/build.gradle.kts`
-- Флейворы: `dev` (versionNameSuffix="-dev") и `prod` с разными BASE_URL
-- R8/ProGuard включён в release
-
-## Бонусные критерии
-
-### Firebase
-- FCM Push-уведомления: `app/src/main/kotlin/com/example/shoppinglistapp/push/PushMessagingService.kt`
-- Remote Config: `app/src/main/kotlin/com/example/shoppinglistapp/config/FirebaseRemoteConfigService.kt`
-- Firestore: `app/src/main/kotlin/com/example/shoppinglistapp/firestore/FirestoreService.kt`
-
-### Использование ИИ
-- Gemini через OpenRouter API
-- Сервис: `app/src/main/kotlin/com/example/shoppinglistapp/ai/GeminiService.kt`
-- Экран: `app/src/main/kotlin/com/example/shoppinglistapp/ui/ai/AiSuggestScreen.kt`
-- Пользователь вводит блюдо или событие — AI предлагает список продуктов для добавления в список покупок
-
-### Интеграция внешних сервисов
-- Авторизация VK и Яндекс ID
-- Firebase Crashlytics + AppMetrica с кастомными событиями
-- Интерфейс CrashReporter: `app/src/main/kotlin/com/example/shoppinglistapp/crash/`
-
-## Ветки многомодульности (Лаба 5)
-
-- `layer-based` — UI выделен в отдельный модуль `:presentation`
-- `feature-based` — фича-модули `:feature-list`, `:feature-items`, `:feature-category`, `:feature-history`
-- `combined` — комбинированный подход по рекомендации Google
+Скачать: [Releases](https://github.com/an4ek/Shopping-List/releases/tag/v1.0)
 
 ## Сборка
 
@@ -74,6 +29,163 @@
 ./gradlew assembleDevDebug
 ```
 
-## APK
+---
 
-Скачать APK: [Releases](https://github.com/an4ek/Shopping-List/releases)
+## Обязательные критерии
+
+### 1. Чистая архитектура · 5 баллов
+
+Проект разбит на 4 Gradle-модуля:
+
+| Модуль | Назначение |
+|--------|-----------|
+| `:domain` | Чистый Kotlin без Android. Модели, интерфейсы репозиториев, Use Cases |
+| `:data` | Room, реализации репозиториев, преобразование данных из БД в модели |
+| `:core` | Базовая ViewModel с обработкой ошибок, вспомогательные классы |
+| `:app` | Экраны на Compose, ViewModels, навигация, подключение зависимостей |
+
+Правило: модули зависят только от более внутренних. `app` знает про `domain`, `data` знает про `domain`, но `domain` не знает ни про кого.
+
+**Где смотреть:**
+- Use Cases: `domain/src/main/kotlin/com/example/domain/usecase/`
+- Интерфейсы репозиториев: `domain/src/main/kotlin/com/example/domain/repository/`
+- Реализации репозиториев: `data/src/main/kotlin/com/example/data/repository/`
+- Подключение зависимостей (Hilt): `app/src/main/kotlin/com/example/shoppinglistapp/di/`
+
+**DI через Hilt** — все зависимости передаются через конструктор, Hilt сам создаёт нужные объекты.
+
+---
+
+### 2. Фоновые задачи и сервисы · 3 балла
+
+**WorkManager** — периодическая синхронизация каждые 15 минут:
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/worker/SyncWorker.kt`
+- Запускается только при наличии интернета
+- Стартует автоматически при запуске приложения
+- Не создаёт дубликаты если уже запущен
+
+**BroadcastReceiver** — реакция на перезагрузку устройства:
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/receiver/BootReceiver.kt`
+- Когда телефон перезагружается, заново запускает периодическую синхронизацию
+- Зарегистрирован в `AndroidManifest.xml`
+
+---
+
+### 3. Анимации в Jetpack Compose · 2 балла
+
+Файл: `app/src/main/kotlin/com/example/shoppinglistapp/ui/lists/ShoppingListScreen.kt`
+
+**AnimatedVisibility** — промо-баннер:
+- Баннер плавно появляется и исчезает при изменении настроек в Firebase Remote Config
+- При появлении — плавное раскрытие сверху вниз
+- При скрытии — плавное сворачивание
+
+**animateColorAsState** — карточка списка:
+- Когда список отмечается как завершённый, карточка плавно меняет цвет фона
+- Пользователь видит мягкий переход цвета вместо резкого переключения
+
+---
+
+### 4. XML разметка и интеграция Compose · 2 балла
+
+**XML layout:**
+- Файл: `app/src/main/res/layout/activity_help.xml`
+- Обычная XML-разметка с TextView и ComposeView внутри
+
+**Activity:**
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/ui/help/HelpActivity.kt`
+- Экран создаётся через XML (`setContentView`)
+- Внутри XML находится ComposeView — в него вставляется Compose-контент
+- Показывает инструкцию по использованию приложения
+
+---
+
+### 5. Gradle: конфигурация сборок · 2 балла
+
+Файл: `app/build.gradle.kts`
+
+**Два варианта приложения (productFlavors):**
+
+| | dev | prod |
+|--|-----|------|
+| Для чего | Разработка и тестирование | Финальная версия |
+| Адрес сервера | `https://dev.api.shoppinglist.com` | `https://api.shoppinglist.com` |
+
+**Два типа сборки (buildTypes):**
+- `debug` — для разработки, код не сжимается
+- `release` — для публикации, R8 сжимает и оптимизирует код, делает его меньше
+
+Итого 4 варианта сборки: `devDebug`, `devRelease`, `prodDebug`, `prodRelease`
+
+---
+
+### 6. Качество кода и UX · 1 балл
+
+- Все операции в ViewModel обёрнуты в обработку ошибок через `launchSafe`
+- При ошибке приложение не падает — ошибка фиксируется в Crashlytics и AppMetrica
+- Экраны показывают три состояния: загрузка → данные / ошибка
+- Пустой список — отдельное состояние с подсказкой
+
+---
+
+## Бонусные критерии
+
+### Firebase · +2 балла
+
+**FCM Push-уведомления:**
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/push/PushMessagingService.kt`
+- Уведомления работают когда приложение открыто и когда свёрнуто
+- Нажатие на уведомление открывает нужный экран приложения
+
+**Remote Config:**
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/config/FirebaseRemoteConfigService.kt`
+- Параметры в Firebase консоли: текст баннера и флаг показа промо
+- Изменения применяются без перевыпуска приложения
+
+**Firestore:**
+- Файл: `app/src/main/kotlin/com/example/shoppinglistapp/firestore/FirestoreService.kt`
+- Хранит профиль пользователя: имя, email, FCM-токен
+- Обновляется в реальном времени
+- Правила доступа: пользователь видит только свои данные
+
+---
+
+### Использование ИИ · +2 балла
+
+**Gemini через OpenRouter API:**
+- Сервис: `app/src/main/kotlin/com/example/shoppinglistapp/ai/GeminiService.kt`
+- Экран: `app/src/main/kotlin/com/example/shoppinglistapp/ui/ai/AiSuggestScreen.kt`
+
+**Сценарий использования:**
+1. Открываешь список покупок
+2. Нажимаешь кнопку AI в правом верхнем углу
+3. Вводишь блюдо или событие — например "борщ" или "пикник"
+4. Gemini предлагает список продуктов
+5. Отмечаешь галочками нужные
+6. Нажимаешь "Добавить выбранные" — продукты появляются в списке
+
+---
+
+### Интеграция внешних сервисов · +1 балл
+
+**Авторизация VK и Яндекс ID:**
+- Токен сохраняется в зашифрованном хранилище на устройстве
+- При повторном запуске экран входа пропускается если уже входил
+
+**Firebase Crashlytics + AppMetrica:**
+- Общий интерфейс `CrashReporter`: `app/src/main/kotlin/com/example/shoppinglistapp/crash/`
+- Одна команда отправляет ошибку сразу в оба сервиса
+- Кастомные события: открытие экрана, создание списка, авторизация
+- Кнопка тестового краша на главном экране (⚠️) для демонстрации
+
+---
+
+## Ветки многомодульности
+
+| Ветка | Описание |
+|-------|----------|
+| `layer-based` | UI выделен в отдельный модуль `:presentation` |
+| `feature-based` | Каждая фича — отдельный модуль. Общая навигация через `:core-navigation` |
+| `combined` | Комбинированный подход Google: фичи + слои внутри каждой фичи |
+
+Архитектурные правила проверяются тестами Konsist: `konsist-tests/src/test/kotlin/ArchitectureTest.kt`
