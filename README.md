@@ -4,7 +4,7 @@
 
 ## Скриншоты
 
-> Добавьте скриншоты приложения после запуска на устройстве/эмуляторе.
+![Авторизация](screenshots/01_login.png) ![Списки покупок](screenshots/02_lists.png) ![Товары](screenshots/03_items.png) ![AI-помощник](screenshots/04_ai.png) ![О нас](screenshots/05_about.png)
 
 ## Функциональность
 
