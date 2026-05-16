@@ -19,6 +19,8 @@ import com.example.domain.model.ShoppingItem
 @Composable
 fun ShoppingItemScreen(
     onBack: () -> Unit,
+    onAiClick: () -> Unit,
+    onAiItemsReceived: ((List<String>) -> Unit) -> Unit,
     viewModel: ShoppingItemViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -26,12 +28,23 @@ fun ShoppingItemScreen(
     var newItemName by remember { mutableStateOf("") }
     var newItemQty by remember { mutableStateOf("1") }
 
+    LaunchedEffect(Unit) {
+        onAiItemsReceived { items ->
+            items.forEach { viewModel.add(it, "1") }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Товары") },
                 navigationIcon = {
                     TextButton(onClick = onBack) { Text("Назад") }
+                },
+                actions = {
+                    IconButton(onClick = onAiClick) {
+                        Icon(Icons.Default.Add, contentDescription = "AI-помощник")
+                    }
                 }
             )
         },

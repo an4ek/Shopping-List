@@ -82,19 +82,39 @@ fun AppNavigation() {
             ShoppingListScreen(
                 onListClick = { listId -> navController.navigate("items/$listId") },
                 onAboutClick = { navController.navigate("about") },
-                onAiClick = { navController.navigate("ai") }
+                onAiClick = { navController.navigate("lists_ai") }
             )
         }
         composable(
             route = "items/{listId}",
             arguments = listOf(navArgument("listId") { type = NavType.LongType })
-        ) {
-            ShoppingItemScreen(onBack = { navController.popBackStack() })
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getLong("listId") ?: return@composable
+            ShoppingItemScreen(
+                onBack = { navController.popBackStack() },
+                onAiClick = { navController.navigate("items_ai/$listId") },
+                onAiItemsReceived = { callback ->
+                    val items = backStackEntry.savedStateHandle.get<ArrayList<String>>("ai_items")
+                    if (!items.isNullOrEmpty()) {
+                        callback(items)
+                        backStackEntry.savedStateHandle.remove<ArrayList<String>>("ai_items")
+                    }
+                }
+            )
         }
         composable("about") {
             AboutScreen(onBack = { navController.popBackStack() })
         }
-        composable("ai") {
+        composable("lists_ai") {
+            AiSuggestScreen(
+                onBack = { navController.popBackStack() },
+                onAddItems = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = "items_ai/{listId}",
+            arguments = listOf(navArgument("listId") { type = NavType.LongType })
+        ) {
             AiSuggestScreen(
                 onBack = { navController.popBackStack() },
                 onAddItems = { items ->

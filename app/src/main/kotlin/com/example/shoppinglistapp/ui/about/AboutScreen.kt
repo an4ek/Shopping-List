@@ -2,6 +2,7 @@ package com.example.shoppinglistapp.ui.about
 
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
@@ -23,7 +24,6 @@ private const val OFFICE_NAME = "ООО ШопингЛист"
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,12 +51,25 @@ fun AboutScreen(onBack: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-
             AndroidView(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 factory = { ctx ->
                     WebView(ctx).apply {
-                        webViewClient = WebViewClient()
+                        webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView,
+                                request: WebResourceRequest
+                            ): Boolean {
+                                val url = request.url.toString()
+                                return when {
+                                    url.startsWith("intent://") ||
+                                    url.startsWith("yandexmaps://") ||
+                                    url.startsWith("ymapsbm1://") -> true
+                                    url.startsWith("http") -> false
+                                    else -> true
+                                }
+                            }
+                        }
                         settings.javaScriptEnabled = true
                         loadUrl(
                             "https://maps.yandex.ru/?ll=$OFFICE_LON,$OFFICE_LAT&z=15&pt=$OFFICE_LON,$OFFICE_LAT,pm2rdm"
@@ -64,7 +77,6 @@ fun AboutScreen(onBack: () -> Unit) {
                     }
                 }
             )
-
             Button(
                 onClick = {
                     val uri = Uri.parse(
