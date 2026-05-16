@@ -26,13 +26,13 @@ android {
         buildConfigField("String", "VK_APP_ID", "\"${localProperties["vk_app_id"]}\"")
         buildConfigField("String", "YANDEX_CLIENT_ID", "\"${localProperties["yandex_client_id"]}\"")
         buildConfigField("String", "MAPKIT_API_KEY", "\"${localProperties["mapkit_api_key"]}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties["gemini_api_key"]}\"")
         manifestPlaceholders["YANDEX_CLIENT_ID"] = localProperties["yandex_client_id"] ?: ""
         manifestPlaceholders["VK_APP_ID"] = localProperties["vk_app_id"] ?: ""
     }
     flavorDimensions += "env"
     productFlavors {
         create("dev") {
-
             versionNameSuffix = "-dev"
             buildConfigField("String", "BASE_URL", "\"https://dev.api.shoppinglist.com\"")
         }
@@ -90,6 +90,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

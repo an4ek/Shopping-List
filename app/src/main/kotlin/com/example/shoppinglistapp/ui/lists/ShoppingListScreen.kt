@@ -1,5 +1,11 @@
 package com.example.shoppinglistapp.ui.lists
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.domain.model.ShoppingList
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,6 +30,7 @@ import com.example.domain.model.ShoppingList
 fun ShoppingListScreen(
     onListClick: (Long) -> Unit,
     onAboutClick: () -> Unit,
+    onAiClick: () -> Unit,
     viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -41,6 +49,9 @@ fun ShoppingListScreen(
             TopAppBar(
                 title = { Text("Списки покупок") },
                 actions = {
+                    IconButton(onClick = onAiClick) {
+                        Icon(Icons.Default.Add, contentDescription = "AI-помощник")
+                    }
                     IconButton(onClick = { showCrashDialog = true }) {
                         Icon(Icons.Default.Warning, contentDescription = "Тест краша", tint = MaterialTheme.colorScheme.error)
                     }
@@ -64,7 +75,11 @@ fun ShoppingListScreen(
                 Text(text = welcomeText, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
             }
 
-            if (showPromo) {
+            AnimatedVisibility(
+                visible = showPromo,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
@@ -155,7 +170,19 @@ fun ShoppingListItem(
     onDelete: () -> Unit,
     onComplete: () -> Unit
 ) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    val cardColor by animateColorAsState(
+        targetValue = if (list.isCompleted)
+            MaterialTheme.colorScheme.surfaceVariant
+        else
+            MaterialTheme.colorScheme.surface,
+        label = "cardColor"
+    )
+
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
+    ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = list.name,

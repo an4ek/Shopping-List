@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shoppinglistapp.auth.AuthServiceImpl
 import com.example.shoppinglistapp.ui.about.AboutScreen
+import com.example.shoppinglistapp.ui.ai.AiSuggestScreen
 import com.example.shoppinglistapp.ui.auth.LoginScreen
 import com.example.shoppinglistapp.ui.auth.LoginViewModel
 import com.example.shoppinglistapp.ui.items.ShoppingItemScreen
@@ -28,7 +29,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     @Inject
     lateinit var authService: com.example.shoppinglistapp.auth.AuthService
 
@@ -42,10 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermission()
-
-        // Регистрируем Яндекс лаунчер
         (authService as? AuthServiceImpl)?.registerYandexLauncher(this)
-
         setContent {
             ShoppingListAppTheme {
                 AppNavigation()
@@ -84,7 +81,8 @@ fun AppNavigation() {
         composable("lists") {
             ShoppingListScreen(
                 onListClick = { listId -> navController.navigate("items/$listId") },
-                onAboutClick = { navController.navigate("about") }
+                onAboutClick = { navController.navigate("about") },
+                onAiClick = { navController.navigate("ai") }
             )
         }
         composable(
@@ -95,6 +93,17 @@ fun AppNavigation() {
         }
         composable("about") {
             AboutScreen(onBack = { navController.popBackStack() })
+        }
+        composable("ai") {
+            AiSuggestScreen(
+                onBack = { navController.popBackStack() },
+                onAddItems = { items ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("ai_items", ArrayList(items))
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
